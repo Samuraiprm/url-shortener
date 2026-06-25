@@ -45,7 +45,6 @@ func main() {
 	}
 
 	var redisCache *cache.RedisCache
-	var err error
 
 	if cfg.RedisURL != "" {
 		redisCache, err = cache.NewRedisCacheFromURL(cfg.RedisURL)

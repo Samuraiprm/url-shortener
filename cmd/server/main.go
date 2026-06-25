@@ -44,7 +44,14 @@ func main() {
 		log.Fatalf("unable to ping database: %v", err)
 	}
 
-	redisCache, err := cache.NewRedisCache(cfg.RedisAddr)
+	var redisCache *cache.RedisCache
+	var err error
+
+	if cfg.RedisURL != "" {
+		redisCache, err = cache.NewRedisCacheFromURL(cfg.RedisURL)
+	} else {
+		redisCache, err = cache.NewRedisCache(cfg.RedisAddr)
+	}
 	if err != nil {
 		log.Fatalf("unable to connect to redis: %v", err)
 	}

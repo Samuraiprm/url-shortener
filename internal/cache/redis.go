@@ -16,7 +16,23 @@ type RedisCache struct {
 }
 
 func NewRedisCache(addr string) (*RedisCache, error) {
-	client := redis.NewClient(&redis.Options{Addr: addr})
+	opts, err := redis.ParseURL("redis://" + addr)
+	if err != nil {
+		opts = &redis.Options{Addr: addr}
+	}
+	client := redis.NewClient(opts)
+	if err := client.Ping(context.Background()).Err(); err != nil {
+		return nil, fmt.Errorf("redis ping: %w", err)
+	}
+	return &RedisCache{client: client, ttl: 10 * time.Minute}, nil
+}
+
+func NewRedisCacheFromURL(redisURL string) (*RedisCache, error) {
+	opts, err := redis.ParseURL(redisURL)
+	if err != nil {
+		return nil, fmt.Errorf("parse redis url: %w", err)
+	}
+	client := redis.NewClient(opts)
 	if err := client.Ping(context.Background()).Err(); err != nil {
 		return nil, fmt.Errorf("redis ping: %w", err)
 	}

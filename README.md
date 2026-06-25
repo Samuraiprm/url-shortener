@@ -1,94 +1,96 @@
 # URL Shortener
 
-High-performance URL shortening service with analytics and caching, built with Go.
+[English](README.en.md) | [Español](README.es.md) | [Deutsch](README.de.md)
 
-## Features
+Сервис сокращения URL с аналитикой и кэшированием, написанный на Go.
 
-- **URL Shortening** — create short codes for long URLs
-- **302 Redirect** — fast redirect to original URL
-- **Analytics** — track clicks with IP, User-Agent, Referrer, timestamp
-- **Redis Caching** — hot URLs served from cache (TTL 10min)
-- **Rate Limiting** — token bucket per IP (10 req/s, burst 20)
-- **Security Headers** — HSTS, CSP, X-Frame-Options, X-XSS-Protection
-- **Request Validation** — blocks javascript/data/vbscript URIs, max 2KB
-- **Prometheus Metrics** — `/metrics` endpoint for monitoring
-- **Swagger/OpenAPI** — interactive API docs at `/swagger/`
+## Возможности
 
-## Tech Stack
+- **Сокращение URL** — генерация коротких кодов для длинных ссылок
+- **302 редирект** — быстрый редирект на оригинальный URL
+- **Аналитика** — учёт кликов с IP, User-Agent, Referrer, временной меткой
+- **Redis кэш** — горячие URL раздаются из кэша (TTL 10 мин)
+- **Rate Limiting** — токен-бакет по IP (10 req/s, burst 20)
+- **Security-заголовки** — HSTS, CSP, X-Frame-Options, X-XSS-Protection
+- **Валидация запросов** — блокировка javascript/data/vbscript URI, макс. 2KB
+- **Prometheus метрики** — эндпоинт `/metrics` для мониторинга
+- **Swagger/OpenAPI** — интерактивная документация API на `/swagger/`
 
-| Component | Technology |
+## Стек технологий
+
+| Компонент | Технология |
 |---|---|
-| Language | Go 1.23+ |
-| Router | chi |
-| Database | PostgreSQL 16 |
-| Cache | Redis 7 |
+| Язык | Go 1.23+ |
+| Роутер | chi |
+| База данных | PostgreSQL 16 |
+| Кэш | Redis 7 |
 | DB Driver | pgx/v5 |
 | Cache Client | go-redis/v9 |
-| API Docs | swaggo |
-| Tests | stdlib + testcontainers |
+| Документация API | swaggo |
+| Тесты | stdlib + testcontainers |
 
-## Project Structure
+## Структура проекта
 
 ```
 url-shortener/
 ├── cmd/server/
-│   └── main.go                    # Entry point, router setup, graceful shutdown
+│   └── main.go                    # Точка входа, настройка роутера, graceful shutdown
 ├── internal/
 │   ├── cache/
-│   │   ├── redis.go               # Redis cache: Get/Set/Invalidate
+│   │   ├── redis.go               # Redis кэш: Get/Set/Invalidate
 │   │   └── redis_integration_test.go
 │   ├── config/
-│   │   └── config.go              # Env-based configuration
+│   │   └── config.go              # Конфигурация из переменных окружения
 │   ├── handler/
-│   │   ├── handler.go             # HTTP handlers with Swagger annotations
-│   │   ├── handler_test.go        # Unit tests
-│   │   └── e2e_test.go            # End-to-end integration tests
+│   │   ├── handler.go             # HTTP-хендлеры с Swagger-аннотациями
+│   │   ├── handler_test.go        # Unit-тесты
+│   │   └── e2e_test.go            # End-to-end интеграционные тесты
 │   ├── middleware/
-│   │   ├── metrics.go             # Prometheus-style metrics
-│   │   ├── ratelimit.go           # Token bucket rate limiter
-│   │   ├── security.go            # Security headers, body limit, request ID
-│   │   ├── security_test.go       # Security middleware tests
-│   │   └── errors.go              # Middleware error types
+│   │   ├── metrics.go             # Метрики в формате Prometheus
+│   │   ├── ratelimit.go           # Rate limiter на токен-бакете
+│   │   ├── security.go            # Security-заголовки, лимит тела, request ID
+│   │   ├── security_test.go       # Тесты security-мидлвари
+│   │   └── errors.go              # Типы ошибок мидлвари
 │   ├── model/
-│   │   └── model.go               # Domain models and DTOs
+│   │   └── model.go               # Доменные модели и DTO
 │   ├── repository/
-│   │   ├── url_repo.go            # PostgreSQL data access
+│   │   ├── url_repo.go            # Работа с PostgreSQL
 │   │   └── url_repo_integration_test.go
 │   └── service/
-│       ├── url_service.go         # Business logic + URL validation
-│       └── url_service_test.go    # Validation unit tests
+│       ├── url_service.go         # Бизнес-логика + валидация URL
+│       └── url_service_test.go    # Unit-тесты валидации
 ├── migrations/
-│   └── 001_init.sql               # Database schema
+│   └── 001_init.sql               # Схема базы данных
 ├── docs/
-│   ├── docs.go                    # Generated Swagger Go code
+│   ├── docs.go                    # Сгенерированный Swagger Go-код
 │   ├── swagger.json
 │   └── swagger.yaml
 ├── docker-compose.yml             # PostgreSQL + Redis
-├── Dockerfile                     # Multi-stage build
-├── Makefile                       # Build/run/test commands
+├── Dockerfile                     # Multi-stage сборка
+├── Makefile                       # Команды сборки/запуска/тестов
 └── go.mod
 ```
 
-## Quick Start
+## Быстрый старт
 
-### Prerequisites
+### Требования
 
 - Go 1.23+
-- Docker & Docker Compose
+- Docker и Docker Compose
 
-### Run locally
+### Запуск локально
 
 ```bash
-# Start PostgreSQL and Redis
+# Запуск PostgreSQL и Redis
 docker compose up -d
 
-# Run the server
+# Запуск сервера
 go run ./cmd/server
 ```
 
-Server starts on `http://localhost:8080`.
+Сервер стартует на `http://localhost:8080`.
 
-### Run with Docker
+### Запуск через Docker
 
 ```bash
 docker compose up -d --build
@@ -96,7 +98,7 @@ docker compose up -d --build
 
 ## API
 
-### Create short URL
+### Создать короткую ссылку
 
 ```bash
 curl -X POST http://localhost:8080/api/shorten \
@@ -104,7 +106,7 @@ curl -X POST http://localhost:8080/api/shorten \
   -d '{"url": "https://go.dev/doc/"}'
 ```
 
-Response:
+Ответ:
 
 ```json
 {
@@ -114,20 +116,20 @@ Response:
 }
 ```
 
-### Redirect
+### Редирект
 
 ```bash
 curl -v http://localhost:8080/a1b2c3d4
 # 302 Found → Location: https://go.dev/doc/
 ```
 
-### Get analytics
+### Получить аналитику
 
 ```bash
 curl http://localhost:8080/api/stats/a1b2c3d4
 ```
 
-Response:
+Ответ:
 
 ```json
 {
@@ -158,71 +160,71 @@ curl http://localhost:8080/health
 # {"status": "ok"}
 ```
 
-### Metrics
+### Метрики
 
 ```bash
 curl http://localhost:8080/metrics
-# Prometheus-format metrics
+# Метрики в формате Prometheus
 ```
 
 ### Swagger UI
 
-Open `http://localhost:8080/swagger/` in browser.
+Откройте `http://localhost:8080/swagger/` в браузере.
 
-## Testing
+## Тестирование
 
 ```bash
-# Unit tests
+# Unit-тесты
 go test ./... -v
 
-# Integration tests (requires Docker)
+# Интеграционные тесты (требуется Docker)
 go test -tags=integration ./... -v -timeout 120s
 ```
 
-### Test coverage
+### Покрытие тестами
 
-| Layer | Type | Tests | Framework |
+| Слой | Тип | Тестов | Фреймворк |
 |---|---|---|---|
 | Handler | Unit | 5 | net/http/httptest |
 | Middleware | Unit | 2 | net/http/httptest |
 | Service | Unit | 1 | stdlib testing |
-| Repository | Integration | 5 | testcontainers |
-| Cache | Integration | 3 | testcontainers |
-| E2E | Integration | 1 | testcontainers |
-| **Total** | | **17** | |
+| Repository | Интеграционный | 5 | testcontainers |
+| Cache | Интеграционный | 3 | testcontainers |
+| E2E | Интеграционный | 1 | testcontainers |
+| **Итого** | | **17** | |
 
-## Security
+## Безопасность
 
-Implemented following OWASP Top 10 guidelines:
+Реализовано по руководствам OWASP Top 10:
 
-- **XSS Prevention** — CSP header, input sanitization, blocks `javascript:` / `data:` / `vbscript:` URIs
-- **Clickjacking** — `X-Frame-Options: DENY`
-- **MIME Sniffing** — `X-Content-Type-Options: nosniff`
-- **HSTS** — `Strict-Transport-Security` with 1-year max-age
-- **DoS Protection** — rate limiting (token bucket), request body size limit (1MB), server timeouts
-- **SSRF Prevention** — only `http` and `https` schemes allowed
-- **Audit Trail** — request ID header, click tracking with IP/User-Agent/Referrer
+- **Защита от XSS** — CSP-заголовок, санитайзинг ввода, блокировка `javascript:` / `data:` / `vbscript:` URI
+- **Защита от Clickjacking** — `X-Frame-Options: DENY`
+- **Защита от MIME Sniffing** — `X-Content-Type-Options: nosniff`
+- **HSTS** — `Strict-Transport-Security` с max-age 1 год
+- **Защита от DoS** — rate limiting (токен-бакет), лимит размера тела запроса (1MB), таймауты сервера
+- **Защита от SSRF** — разрешены только схемы `http` и `https`
+- **Аудит-трейл** — заголовок request ID, отслеживание кликов с IP/User-Agent/Referrer
 
-## Architecture Decisions
+## Архитектурные решения
 
-- **302 Redirect** over 301 — allows analytics tracking on every click
-- **Token bucket** rate limiter — smooths bursts, auto-refills, per-IP isolation
-- **Async click recording** — `go RecordClick()` doesn't block redirect response
-- **Redis cache with 10min TTL** — balances freshness vs performance
-- **pgx pool** — connection pooling built-in, no ORM overhead
-- **chi router** — lightweight, stdlib-compatible, middleware-friendly
+- **302 редирект** вместо 301 — позволяет отслеживать аналитику каждого клика
+- **Токен-бакет** rate limiter — сглаживает всплески, автоматическое пополнение, изоляция по IP
+- **Асинхронная запись кликов** — `go RecordClick()` не блокирует ответ редиректа
+- **Redis кэш с TTL 10 мин** — баланс между свежестью и производительностью
+- **pgx pool** — встроенный пул соединений, без накладных расходов ORM
+- **chi роутер** — лёгкий, совместимый с stdlib, дружелюбный к мидлвари
 
-## Configuration
+## Конфигурация
 
-Environment variables:
+Переменные окружения:
 
-| Variable | Default | Description |
+| Переменная | По умолчанию | Описание |
 |---|---|---|
-| `PORT` | `8080` | Server port |
-| `DATABASE_URL` | `postgres://shortener:shortener@localhost:5433/shortener?sslmode=disable` | PostgreSQL connection |
-| `REDIS_ADDR` | `localhost:6379` | Redis address |
-| `BASE_URL` | `http://localhost:8080` | Base URL for short links |
+| `PORT` | `8080` | Порт сервера |
+| `DATABASE_URL` | `postgres://shortener:shortener@localhost:5433/shortener?sslmode=disable` | Подключение к PostgreSQL |
+| `REDIS_ADDR` | `localhost:6379` | Адрес Redis |
+| `BASE_URL` | `http://localhost:8080` | Базовый URL для коротких ссылок |
 
-## License
+## Лицензия
 
 MIT

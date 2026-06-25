@@ -1,0 +1,147 @@
+basePath: /
+definitions:
+  model.Click:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      ip:
+        type: string
+      referrer:
+        type: string
+      url_id:
+        type: integer
+      user_agent:
+        type: string
+    type: object
+  model.CreateURLRequest:
+    properties:
+      url:
+        type: string
+    type: object
+  model.CreateURLResponse:
+    properties:
+      code:
+        type: string
+      original_url:
+        type: string
+      short_url:
+        type: string
+    type: object
+  model.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  model.Stats:
+    properties:
+      recent_clicks:
+        items:
+          $ref: '#/definitions/model.Click'
+        type: array
+      total_clicks:
+        type: integer
+      url:
+        $ref: '#/definitions/model.URL'
+    type: object
+  model.URL:
+    properties:
+      code:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      original_url:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: URL Shortener service with analytics and caching
+  title: URL Shortener API
+  version: "1.0"
+paths:
+  /{code}:
+    get:
+      description: 302 redirect to the original URL by short code
+      parameters:
+      - description: Short code
+        in: path
+        name: code
+        required: true
+        type: string
+      responses:
+        "302":
+          description: Found
+        "404":
+          description: Not Found
+      summary: Redirect to original URL
+      tags:
+      - urls
+  /api/shorten:
+    post:
+      consumes:
+      - application/json
+      description: Create a short URL from a long one
+      parameters:
+      - description: URL to shorten
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateURLRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.CreateURLResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "422":
+          description: Unprocessable Entity
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Shorten a URL
+      tags:
+      - urls
+  /api/stats/{code}:
+    get:
+      description: Get click count and recent clicks for a short URL
+      parameters:
+      - description: Short code
+        in: path
+        name: code
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Stats'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get URL analytics
+      tags:
+      - analytics
+  /health:
+    get:
+      description: Returns server health status
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check
+      tags:
+      - system
+swagger: "2.0"
